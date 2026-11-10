@@ -1,0 +1,13 @@
+{
+  "name": "smart-life",
+  "private": true,
+  "workspaces": [
+    "services/otp",
+    "apps/web"
+  ],
+  "scripts": {
+    "start:backend": "npm start --workspace=services/otp",
+    "start:web": "npm run dev --workspace=apps/web",
+    "test:otp": "npm test --workspace=services/otp"
+  }
+}
