@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { sendOtp, verifyOtp } from './lib/otpClient';
 import MembershipPage from './MembershipPage';
+import MemberPortal from './MemberPortal';
 import PublicSite from './PublicSite';
 import saccoLogo from './sacco-logo.png';
 
@@ -39,7 +40,7 @@ function AuthPage() {
       setStep('input');
       setDigits([...EMPTY_DIGITS]);
       setResendIn(RESEND_DELAY);
-      setStatus({ message: 'Code sent. For this demo, check the backend terminal for the mock SMS code.', type: 'success' });
+      setStatus({ message: 'Demo code generated. It is printed in the backend terminal; this does not sign you in to a member account.', type: 'success' });
       window.setTimeout(() => refs.current[0]?.focus(), 0);
     } catch (error) {
       setStatus({ message: error.message || 'Could not connect to the backend.', type: 'error' });
@@ -78,7 +79,7 @@ function AuthPage() {
     }
   };
 
-  const verifyOtp = async (event) => {
+  const handleVerifyOtp = async (event) => {
     event.preventDefault();
     const code = digits.join('');
     if (code.length !== 6) {
@@ -91,12 +92,15 @@ function AuthPage() {
     setStatus({ message: 'Verifying your code…', type: 'info' });
 
     try {
-      const data = await verifyOtp(phone.trim(), code);
+      await verifyOtp(phone.trim(), code);
       setStep('success');
-      setStatus({ message: data.message || 'Your code was verified successfully.', type: 'success' });
+      setStatus({
+        message: 'Demo phone check complete. No member account or secure session has been created.',
+        type: 'success',
+      });
     } catch (error) {
       setStatus({
-        message: 'We couldn’t confirm your application. Your details are still here; please try again, or call us on +254 700 123 456.',
+        message: 'We couldn’t verify the demo code. Your phone number is still here; please try again, or call us on +254 700 123 456.',
         type: 'error',
       });
       setDigits([...EMPTY_DIGITS]);
@@ -120,20 +124,23 @@ function AuthPage() {
       </header>
 
       <section className="auth-card" aria-labelledby="page-title">
-        <div className="eyebrow">SECURE SIGN IN</div>
+        <div className="eyebrow">DEMO PHONE CHECK</div>
         <h1 id="page-title">
-          {step === 'success' ? 'You’re all set' : step === 'input' ? 'Check your phone' : 'Welcome back'}
+          {step === 'success' ? 'Demo check complete' : step === 'input' ? 'Check your phone' : 'Verify your phone'}
         </h1>
         <p className="subtitle">
           {step === 'success'
-            ? 'Your identity has been verified successfully.'
+            ? 'The demo code was accepted. This does not sign you in to a member account.'
             : step === 'input'
               ? 'Enter the 6-digit verification code to continue.'
-              : 'Verify your identity to continue to your learning space.'}
+              : 'Try the phone verification demo. It does not confirm membership or provide access to an account.'}
         </p>
 
         {step === 'start' && (
           <form className="form-content" onSubmit={requestCode}>
+            <p className="demo-warning" role="note">
+              Demo only: the backend logs the entered phone number and mock code. Use a test number only; never enter a real member number or sensitive information.
+            </p>
             <label className="phone-label" htmlFor="phone">Phone number</label>
             <input
               id="phone"
@@ -156,7 +163,7 @@ function AuthPage() {
         )}
 
         {step === 'input' && (
-          <form className="form-content" onSubmit={verifyOtp}>
+          <form className="form-content" onSubmit={handleVerifyOtp}>
             <div className="code-inputs" onPaste={handlePaste} aria-label="Verification code">
               {digits.map((digit, index) => (
                 <input
@@ -196,7 +203,8 @@ function AuthPage() {
         {step === 'success' && (
           <div className="form-content">
             <div className="success-icon" aria-hidden="true">✓</div>
-            <button className="primary-button" onClick={startOver}>Back to sign in</button>
+            <a className="primary-button" href="/member">View member portal preview <span aria-hidden="true">→</span></a>
+            <button className="text-button" type="button" onClick={startOver}>Try the demo again</button>
           </div>
         )}
 
@@ -208,7 +216,7 @@ function AuthPage() {
 
         <footer className="card-footer">
           <span className="lock-icon" aria-hidden="true">◇</span>
-          Your verification is protected and secure
+          No member account or secure session is created
         </footer>
       </section>
       <p className="page-note">SMARTLIFE SACCO <span>•</span> LEARN WITH CONFIDENCE</p>
@@ -225,12 +233,16 @@ export default function App() {
         description: 'Explore Smartlife SACCO membership, savings, member services and responsible credit options.',
       },
       '/login': {
-        title: 'Member login | Smartlife SACCO',
-        description: 'Sign in to Smartlife SACCO member services.',
+        title: 'Demo phone check | Smartlife SACCO',
+        description: 'Try the Smartlife SACCO demo phone verification. This does not create a member session.',
       },
       '/membership': {
         title: 'Membership | Smartlife SACCO',
         description: 'Learn about the Smartlife SACCO membership application process and what to prepare.',
+      },
+      '/member': {
+        title: 'Member portal preview | Smartlife SACCO',
+        description: 'Preview the Smartlife SACCO member portal. Member accounts and financial data are not connected.',
       },
     };
     const details = pageDetails[path] || pageDetails['/'];
@@ -240,5 +252,6 @@ export default function App() {
 
   if (path === '/login') return <AuthPage />;
   if (path === '/membership') return <MembershipPage />;
+  if (path === '/member') return <MemberPortal />;
   return <PublicSite />;
 }

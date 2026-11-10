@@ -16,6 +16,13 @@ function generateCode(key, recipient) {
   console.log(`\n📱 [MOCK SMS] Code for ${recipient} is: ${code}\n`);
 }
 
+function allowMockOtp(req, res, next) {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(503).json({ error: 'Demo OTP verification is disabled in production.' });
+  }
+  return next();
+}
+
 function verifyCode(key, code, res) {
   const otp = otps.get(key);
 
@@ -34,7 +41,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running perfectly!' });
 });
 
-app.post('/api/otp/generate', (req, res) => {
+app.post('/api/otp/generate', allowMockOtp, (req, res) => {
   const { userId } = req.body || {};
   if (typeof userId !== 'string' || !userId.trim()) {
     return res.status(400).json({ error: 'A valid userId is required.' });
@@ -44,7 +51,7 @@ app.post('/api/otp/generate', (req, res) => {
   res.json({ sent: true, message: 'Code generated and sent!' });
 });
 
-app.post('/api/otp/send', (req, res) => {
+app.post('/api/otp/send', allowMockOtp, (req, res) => {
   const { phone } = req.body || {};
   if (!isValidPhone(phone)) {
     return res.status(400).json({ error: 'Enter a valid phone number in international format, for example +254700000000.' });
@@ -54,7 +61,7 @@ app.post('/api/otp/send', (req, res) => {
   res.json({ sent: true, message: 'Code generated and sent!' });
 });
 
-app.post('/api/otp/verify', (req, res) => {
+app.post('/api/otp/verify', allowMockOtp, (req, res) => {
   const { phone, userId, code } = req.body || {};
   if (typeof code !== 'string' || !/^\d{6}$/.test(code)) {
     return res.status(400).json({ error: 'A valid 6-digit code is required.' });
