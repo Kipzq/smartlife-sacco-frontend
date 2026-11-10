@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { sendOtp, verifyOtp } from './lib/otpClient';
+import MembershipPage from './MembershipPage';
 import PublicSite from './PublicSite';
 import saccoLogo from './sacco-logo.png';
 
@@ -217,5 +218,27 @@ function AuthPage() {
 
 export default function App() {
   const path = window.location.pathname.replace(/\/+$/, '') || '/';
-  return path === '/login' ? <AuthPage /> : <PublicSite />;
+  useEffect(() => {
+    const pageDetails = {
+      '/': {
+        title: 'Smartlife SACCO | Save Today. Grow Tomorrow.',
+        description: 'Explore Smartlife SACCO membership, savings, member services and responsible credit options.',
+      },
+      '/login': {
+        title: 'Member login | Smartlife SACCO',
+        description: 'Sign in to Smartlife SACCO member services.',
+      },
+      '/membership': {
+        title: 'Membership | Smartlife SACCO',
+        description: 'Learn about the Smartlife SACCO membership application process and what to prepare.',
+      },
+    };
+    const details = pageDetails[path] || pageDetails['/'];
+    document.title = details.title;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', details.description);
+  }, [path]);
+
+  if (path === '/login') return <AuthPage />;
+  if (path === '/membership') return <MembershipPage />;
+  return <PublicSite />;
 }

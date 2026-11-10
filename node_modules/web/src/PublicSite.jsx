@@ -58,7 +58,7 @@ function ArrowIcon() {
 
 function Brand({ footer = false }) {
   return (
-    <a className={`site-brand${footer ? ' site-brand-footer' : ''}`} href="#home" aria-label="Smartlife SACCO home">
+    <a className={`site-brand${footer ? ' site-brand-footer' : ''}`} href="/" aria-label="Smartlife SACCO home">
       <img src={saccoLogo} alt="" />
       <span className="site-brand-copy">
         <strong>SMARTLIFE</strong>
@@ -113,7 +113,7 @@ export default function PublicSite() {
               <h1>Small steps today.<br /><em>More possibilities</em><br />tomorrow.</h1>
               <p>Build a savings habit, find support for your plans and grow alongside a cooperative that puts its members first.</p>
               <div className="hero-actions">
-                <a className="button button-primary" href="#membership">Explore membership <ArrowIcon /></a>
+                <a className="button button-primary" href="/membership">Explore membership <ArrowIcon /></a>
                 <a className="button button-secondary" href="#services">Discover our services</a>
               </div>
               <div className="hero-note">
@@ -233,7 +233,7 @@ export default function PublicSite() {
               <h2>Interested in becoming<br />a <em>member?</em></h2>
               <p>Online membership applications are being prepared. Contact Smartlife SACCO to confirm current requirements and the application process.</p>
             </div>
-            <a className="button button-primary" href="tel:+254700123456">Call +254 700 123 456 <ArrowIcon /></a>
+            <a className="button button-primary" href="/membership">Membership information <ArrowIcon /></a>
           </div>
         </section>
 
@@ -316,7 +316,7 @@ export default function PublicSite() {
           </div>
           <div className="footer-links">
             <span>MEMBERS</span>
-            <a href="#membership">Membership enquiries</a>
+            <a href="/membership">Membership information</a>
             <a href="/login">Member login</a>
             <a href="#contact">Contact us</a>
           </div>
