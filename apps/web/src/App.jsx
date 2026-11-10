@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { sendOtp, verifyOtp } from './lib/otpClient';
+import PublicSite from './PublicSite';
 import saccoLogo from './sacco-logo.png';
 
 const EMPTY_DIGITS = Array(6).fill('');
 const RESEND_DELAY = 30;
 
-export default function App() {
+function AuthPage() {
   const [phone, setPhone] = useState('');
   const [digits, setDigits] = useState(EMPTY_DIGITS);
   const [status, setStatus] = useState({ message: '', type: 'info' });
@@ -212,4 +213,9 @@ export default function App() {
       <p className="page-note">SMARTLIFE SACCO <span>•</span> LEARN WITH CONFIDENCE</p>
     </main>
   );
+}
+
+export default function App() {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  return path === '/login' ? <AuthPage /> : <PublicSite />;
 }
