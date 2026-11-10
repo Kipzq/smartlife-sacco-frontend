@@ -93,7 +93,10 @@ export default function App() {
       setStep('success');
       setStatus({ message: data.message || 'Your code was verified successfully.', type: 'success' });
     } catch (error) {
-      setStatus({ message: error.message || 'Could not connect to the backend.', type: 'error' });
+      setStatus({
+        message: 'We couldn’t confirm your application. Your details are still here; please try again, or call us on +254 700 123 456.',
+        type: 'error',
+      });
       setDigits([...EMPTY_DIGITS]);
       refs.current[0]?.focus();
     } finally {
