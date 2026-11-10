@@ -15,6 +15,7 @@ function AuthPage() {
   const [status, setStatus] = useState({ message: '', type: 'info' });
   const [step, setStep] = useState('start');
   const [loading, setLoading] = useState('');
+  const [demoMode, setDemoMode] = useState(false);
   const [resendIn, setResendIn] = useState(0);
   const refs = useRef([]);
 
@@ -36,11 +37,15 @@ function AuthPage() {
     setStatus({ message: 'Sending your verification code…', type: 'info' });
 
     try {
-      await sendOtp(normalizedPhone);
+      const result = await sendOtp(normalizedPhone);
+      setDemoMode(result.demo === true);
       setStep('input');
       setDigits([...EMPTY_DIGITS]);
       setResendIn(RESEND_DELAY);
-      setStatus({ message: 'Demo code generated. It is printed in the backend terminal; this does not sign you in to a member account.', type: 'success' });
+      setStatus({
+        message: result.message || 'A verification code has been sent to your phone.',
+        type: 'success',
+      });
       window.setTimeout(() => refs.current[0]?.focus(), 0);
     } catch (error) {
       setStatus({ message: error.message || 'Could not connect to the backend.', type: 'error' });
@@ -92,15 +97,18 @@ function AuthPage() {
     setStatus({ message: 'Verifying your code…', type: 'info' });
 
     try {
-      await verifyOtp(phone.trim(), code);
+      const result = await verifyOtp(phone.trim(), code);
+      if (result.verified !== true) {
+        throw new Error('We could not confirm your phone number. Please request a new code.');
+      }
       setStep('success');
       setStatus({
-        message: 'Demo phone check complete. No member account or secure session has been created.',
+        message: result.message || 'Phone number verified. No member account or secure session has been created.',
         type: 'success',
       });
     } catch (error) {
       setStatus({
-        message: 'We couldn’t verify the demo code. Your phone number is still here; please try again, or call us on +254 700 123 456.',
+        message: error.message || 'We could not verify your phone number. Please try again, or call us on +254 700 123 456.',
         type: 'error',
       });
       setDigits([...EMPTY_DIGITS]);
@@ -114,6 +122,7 @@ function AuthPage() {
     setStep('start');
     setDigits([...EMPTY_DIGITS]);
     setStatus({ message: '', type: 'info' });
+    setDemoMode(false);
   };
 
   return (
@@ -124,22 +133,25 @@ function AuthPage() {
       </header>
 
       <section className="auth-card" aria-labelledby="page-title">
-        <div className="eyebrow">DEMO PHONE CHECK</div>
+        <div className="eyebrow">PHONE VERIFICATION</div>
         <h1 id="page-title">
-          {step === 'success' ? 'Demo check complete' : step === 'input' ? 'Check your phone' : 'Verify your phone'}
+          {step === 'success' ? 'Phone verified' : step === 'input' ? 'Check your phone' : 'Verify your phone'}
         </h1>
         <p className="subtitle">
           {step === 'success'
-            ? 'The demo code was accepted. This does not sign you in to a member account.'
+            ? 'Your phone number is verified. This does not sign you in to a member account.'
             : step === 'input'
-              ? 'Enter the 6-digit verification code to continue.'
-              : 'Try the phone verification demo. It does not confirm membership or provide access to an account.'}
+              ? demoMode
+                ? 'Enter the 6-digit code shown by the local demo backend.'
+                : 'Enter the 6-digit verification code sent to your phone.'
+              : 'Confirm you can receive a one-time code. Phone verification alone does not confirm SACCO membership or grant account access.'}
         </p>
 
         {step === 'start' && (
           <form className="form-content" onSubmit={requestCode}>
             <p className="demo-warning" role="note">
-              Demo only: the backend logs the entered phone number and mock code. Use a test number only; never enter a real member number or sensitive information.
+              A one-time SMS may incur message and data charges. Phone verification confirms possession
+              of a number only; it does not confirm membership or grant account access.
             </p>
             <label className="phone-label" htmlFor="phone">Phone number</label>
             <input
@@ -204,7 +216,7 @@ function AuthPage() {
           <div className="form-content">
             <div className="success-icon" aria-hidden="true">✓</div>
             <a className="primary-button" href="/member">View member portal preview <span aria-hidden="true">→</span></a>
-            <button className="text-button" type="button" onClick={startOver}>Try the demo again</button>
+            <button className="text-button" type="button" onClick={startOver}>Verify another number</button>
           </div>
         )}
 
@@ -233,8 +245,8 @@ export default function App() {
         description: 'Explore Smartlife SACCO membership, savings, member services and responsible credit options.',
       },
       '/login': {
-        title: 'Demo phone check | Smartlife SACCO',
-        description: 'Try the Smartlife SACCO demo phone verification. This does not create a member session.',
+      title: 'Phone verification | Smartlife SACCO',
+      description: 'Verify phone possession by one-time SMS. This does not confirm membership or create a member session.',
       },
       '/membership': {
         title: 'Membership | Smartlife SACCO',
