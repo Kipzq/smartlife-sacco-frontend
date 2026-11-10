@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { sendOtp, verifyOtp } from './lib/otpClient';
+import saccoLogo from './sacco-logo.png';
 
 const EMPTY_DIGITS = Array(6).fill('');
 const RESEND_DELAY = 30;
@@ -109,7 +110,7 @@ export default function App() {
   return (
     <main className="page-shell">
       <header className="brand">
-        <span className="brand-mark" aria-hidden="true">S</span>
+        <img className="brand-logo" src={saccoLogo} alt="Smartlife Sacco Logo" />
         <span>Smartlife Sacco</span>
       </header>
 
