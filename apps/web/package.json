@@ -2,7 +2,9 @@
   "name": "web",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "prebuild": "node -e \"const fs=require('node:fs');const path=require('node:path');if(process.platform!=='win32'){const packagePath=require.resolve('vite/package.json');const binaryPath=path.resolve(path.dirname(packagePath),'..','.bin','vite');fs.chmodSync(binaryPath,0o755)}\"",
+    "build": "vite build"
   },
   "dependencies": {
     "react": "^18.3.1",
